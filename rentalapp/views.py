@@ -107,12 +107,12 @@ class bookingViewSet(viewsets.ModelViewSet):
             "booking": BookingSerializer(booking).data
         })
     
-    @action(detail=False,methods=['post'])
+    @action(detail=False,methods=['get'])
     def get_bookings_user(self,request,pk=None):
         user_id=request.query_params.get('user_id')
 
         try:
-            user=User.objects.get(id=user_id)
+            user=User.objects.get(user=user_id)
         except User.DoesNotExist:
             return Response({"error": "No bookings found for user."}, status=400)
         
