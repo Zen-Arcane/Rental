@@ -58,11 +58,16 @@ class bookingViewSet(viewsets.ModelViewSet):
         except Car.DoesNotExist:
             return Response({"error": "Car not found."}, status=400)
         
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=400)
+        
         booking_date=timezone.now()
         
         booking=Booking.objects.create(
             car=car,
-            user=user_id,
+            user=user,
             start_date=start_date,
             end_date=end_date,
             booking_date=booking_date,
