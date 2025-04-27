@@ -23,7 +23,7 @@ class Booking(models.Model):
         user = models.ForeignKey(User, related_name="bookings", on_delete=models.CASCADE)
         start_date=models.DateField()
         end_date=models.DateField()
-        booking_date=models.DateField()
+        booking_date=models.DateTimeField(default='2025-04-01 00:00:00')
         is_confirmed=models.BooleanField(default=False)
         is_cancelled=models.BooleanField(default=False)
 
