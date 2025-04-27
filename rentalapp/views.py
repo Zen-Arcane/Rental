@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Car,User,Booking
 from .serializers import CarSerializer,UserSerializer,BookingSerializer
+from django.utils import timezone 
 
 
 class carViewSet(viewsets.ModelViewSet):
@@ -15,7 +16,7 @@ class carViewSet(viewsets.ModelViewSet):
     @action(detail=False,methods=['get'])
     def get_cars(self,request):
         name=request.query_params.get('name')
-        car=Car.objects.filter(name__icontains=name,price=1313)
+        car=Car.objects.filter(name__icontains=name)
         return Response(CarSerializer(car,many=True).data)
     
     #test APIS
@@ -42,8 +43,43 @@ class bookingViewSet(viewsets.ModelViewSet):
     queryset=Booking.objects.all()
     serializer_class=BookingSerializer
 
+    #create booking
+    @action(detail=False,methods=['post'])
+    def create_booking(self,request,pk=None):
+        car_id=request.data.get('car_id')
+        user_id=request.data.get('user_id')
+        start_date=request.data.get('start_date')
+        end_date=request.data.get('end_date')
 
-    #Update booking status
+        try:
+            car=Car.objects.get(id=car_id)
+            if not car.is_available:
+                    return Response({"error": "Car is not available."}, status=400)
+        except Car.DoesNotExist:
+            return Response({"error": "Car not found."}, status=400)
+        
+        booking_date=timezone.now()
+        
+        booking=Booking.objects.create(
+            car=car,
+            user=user_id,
+            start_date=start_date,
+            end_date=end_date,
+            booking_date=booking_date,
+            is_confirmed=False,
+            is_cancelled=False,
+
+        )
+        car.is_available=False
+        car.save()
+
+        return Response({
+            "message": "Booking created successfully.",
+            "booking": BookingSerializer(booking).data
+        }, status=201)
+    
+
+    #Update booking status for confirming
     @action(detail=True,methods=['post'])
     def confirm_booking(self,request,pk=None):
         booking=self.get_object()
