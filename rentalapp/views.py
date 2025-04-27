@@ -112,7 +112,7 @@ class bookingViewSet(viewsets.ModelViewSet):
         user_id=request.query_params.get('user_id')
 
         try:
-            user=User.objects.get(user=user_id)
+            user=User.objects.get(id=user_id)
         except User.DoesNotExist:
             return Response({"error": "No bookings found for user."}, status=400)
         
