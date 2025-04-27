@@ -75,7 +75,6 @@ class bookingViewSet(viewsets.ModelViewSet):
             is_cancelled=False,
 
         )
-        car.is_available=False
         car.save()
 
         return Response({
