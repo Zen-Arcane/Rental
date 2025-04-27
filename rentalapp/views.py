@@ -64,6 +64,10 @@ class bookingViewSet(viewsets.ModelViewSet):
             return Response({"error": "User not found."}, status=400)
         
         booking_date=timezone.now()
+
+        if Booking.objects.filter(car=car, user=user).exists():
+            return Response({"error": "Booking already exists."}, status=400)
+
         
         booking=Booking.objects.create(
             car=car,
