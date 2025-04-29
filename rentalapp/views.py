@@ -14,9 +14,15 @@ class carViewSet(viewsets.ModelViewSet):
 
     #test APIS
     @action(detail=False,methods=['get'])
-    def get_cars(self,request):
+    def get_cars_by_name(self,request):
         name=request.query_params.get('name')
         car=Car.objects.filter(name__icontains=name)
+        return Response(CarSerializer(car,many=True).data)
+    
+    @action(detail=False,methods=['get'])
+    def get_cars(self,request):
+        brand=request.query_params.get('brand')
+        car=Car.objects.filter(brand__icontains=brand)
         return Response(CarSerializer(car,many=True).data)
     
     #test APIS
