@@ -2,18 +2,22 @@ from django.db import models
 
 class Car(models.Model):
         name = models.CharField(max_length=100)
+        brand = models.CharField(max_length=100)
         description=models.TextField()
         price = models.DecimalField(max_digits=8,decimal_places=2)
         is_available = models.BooleanField(default=True)
         created_at=models.DateTimeField(auto_now_add=True)
+        rating=models.DecimalField(max_digits=2,decimal_places=1)
         image=models.ImageField(upload_to='images/')
+        video_url=models.TextField()
 
         def __str__(self):
             return self.name
 class User(models.Model):
         user=models.CharField(max_length=100)
         phone=models.CharField(max_length=10)
-        email=models.EmailField() 
+        email=models.EmailField()
+        passwd=models.CharField(max_length=255) 
 
         def __str__(self):
            return self.user

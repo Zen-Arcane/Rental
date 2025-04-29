@@ -4,12 +4,12 @@ from .models import Car,User,Booking
 class CarSerializer(serializers.ModelSerializer):
     class Meta:
         model=Car
-        fields=['id','name','description','price','is_available','created_at','image']
+        fields=['id','name','brand','description','price','is_available','created_at','rating','image','video_url']
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model=User
-        fields=['id','user','phone','email']
+        fields=['id','user','phone','email','passwd']
 class BookingSerializer(serializers.ModelSerializer):
 
     car_details = CarSerializer(source='car', read_only=True)
