@@ -8,7 +8,11 @@ class Car(models.Model):
         is_available = models.BooleanField(default=True)
         created_at=models.DateTimeField(auto_now_add=True)
         rating=models.DecimalField(max_digits=2,decimal_places=1)
+<<<<<<< HEAD
         image = models.ImageField(upload_to='uploads/')
+=======
+        image=models.TextField()
+>>>>>>> 3d99e6dd25344f98355d82ecf252731cf8668796
         video_url=models.TextField()
 
         def __str__(self):
