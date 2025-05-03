@@ -4,9 +4,9 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Car,User,Booking
-from .serializers import CarSerializer,UserSerializer,BookingSerializer
+from .serializers import CarSerializer,UserSerializer,BookingSerializer,UserProfileSerializer
 from django.utils import timezone 
-
+from django.contrib.auth.hashers import check_password
 
 class carViewSet(viewsets.ModelViewSet):
     queryset=Car.objects.all()
@@ -93,6 +93,35 @@ class bookingViewSet(viewsets.ModelViewSet):
         }, status=201)
     
 
+    @action(detail=False,methods=['post'])
+    def delete_booking(self,request):
+        booking_id=request.query_params.get('id')
+        if not booking_id:
+                return Response({"error":"Booking id not found."},status=400)
+
+        booking=Booking.objects.filter(id=booking_id).first()
+        if not booking:
+            return Response({"error":"Booking doesnot exist."},status=400)
+        
+        booking.delete()
+        return Response({"Success":"Booking deleted"},status=200)
+
+    @action(detail=False,methods=['post'])
+    def cancel_booking(self,request):
+        booking_id=request.query_params.get('id')
+
+        if not booking_id:
+            return Response({"error":"Booking id not found."},status=400)
+        booking=Booking.objects.filter(id=booking_id).first()
+        if not booking:
+            return Response({"error": "Booking does not exist."}, status=400)
+        
+        booking.is_cancelled=True
+        booking.is_confirmed=False
+        booking.save()
+
+        return Response({"success":"Booking Cancelled."},status=200)
+    
     #Update booking status for confirming
     @action(detail=True,methods=['post'])
     def confirm_booking(self,request,pk=None):
@@ -138,10 +167,44 @@ class userViewSet(viewsets.ModelViewSet):
         user=request.query_params.get('user')
         users=User.objects.filter(user__icontains=user)
         if users:
-            return Response(UserSerializer(users,many=True).data)
+            return Response(UserProfileSerializer(users,many=True).data)
         return Response({"error":"user not found"},status=404)  
+    
+
+    @action(detail=False,methods=['post'])
+    def delete_user(self,request):
+        user=request.query_params.get('id')
+        if not user:
+            return Response({"error":"Id not found"},status=400)
+        
+        users=User.objects.filter(id=user)
+
+        if not users:
+            return Response({"error":"User Doesnot exist"},status=400)
+        
+        users.delete()
+        
+        return Response({"Success":"User Deleted Successfully"},status=200)
+       
 
 
+    @action(detail=False, methods=['post'])
+    def login(self, request):
+        username = request.data.get('user')
+        password = request.data.get('pass')
+
+        if not username or not password:
+            return Response({"error": "Username and password required."}, status=400)
+
+        try:
+            user = User.objects.get(user=username)
+            print(password,user.passwd)
+            if check_password(password, user.passwd):
+                return Response({"id": user.id, "success": "User Found"}, status=200)
+            else:
+                return Response({"error": "Invalid password"}, status=400)
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=400)
     #test APIS
     @action(detail=False, methods=['get'])
     def get_user_phone_by_name(self, request):
