@@ -187,7 +187,7 @@ class userViewSet(viewsets.ModelViewSet):
         return Response({"Success":"User Deleted Successfully"},status=200)
        
 
-
+    #login API
     @action(detail=False, methods=['post'])
     def login(self, request):
         username = request.data.get('user')
